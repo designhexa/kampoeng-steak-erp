@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
-  Wrench, CheckCircle, XCircle, Clock, AlertTriangle
+  Wrench, CheckCircle, Clock, AlertTriangle
 } from 'lucide-react';
 import { useSupabase } from '@/contexts/supabase-context';
 
@@ -101,7 +101,7 @@ export default function MaintenanceDashboard() {
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <CardTitle className="text-base">{checklist.task_name}</CardTitle>
+                          <CardTitle className="text-base">{checklist.task}</CardTitle>
                           <p className="text-xs text-gray-500 mt-1">Outlet #{checklist.outlet_id}</p>
                         </div>
                         <Badge 
@@ -119,8 +119,8 @@ export default function MaintenanceDashboard() {
                     <CardContent>
                       <div className="space-y-2 text-sm">
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Assigned:</span>
-                          <span className="font-medium">{checklist.assigned_to || 'Not assigned'}</span>
+                          <span className="text-gray-600">Status:</span>
+                          <span className="font-medium">{checklist.completed ? 'Selesai' : 'Pending'}</span>
                         </div>
                         <div className="text-xs text-gray-500">
                           {new Date(checklist.created_at).toLocaleString('id-ID')}
