@@ -15,9 +15,11 @@ export default function HRDashboard() {
   const router = useRouter();
   const { employees = [] } = useSupabase();
 
-  const activeEmployees = employees.filter(e => e.status === 'Active');
-  const inactiveEmployees = employees.filter(e => e.status === 'Inactive');
-  const onLeaveEmployees = employees.filter(e => e.status === 'On Leave');
+  // Filter employees based on their status
+  const activeEmployees = employees?.filter(e => e.status === 'Active') ?? [];
+  const inactiveEmployees = employees?.filter(e => e.status === 'Inactive') ?? [];
+  // Note: OnLeave status is not supported in the current schema
+  const onLeaveEmployees: typeof employees = [];
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -115,14 +117,14 @@ export default function HRDashboard() {
                       <div className="space-y-2 text-sm">
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">NIK:</span>
-                          <span className="font-medium">{employee.nik}</span>
+                          <span className="font-medium">{employee.id}</span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">Outlet:</span>
                           <span className="font-medium">Outlet #{employee.outlet_id}</span>
                         </div>
                         <div className="text-xs text-gray-500">
-                          Bergabung: {new Date(employee.hire_date).toLocaleDateString('id-ID')}
+                          Bergabung: {new Date(employee.created_at).toLocaleDateString('id-ID')}
                         </div>
                       </div>
                     </CardContent>
