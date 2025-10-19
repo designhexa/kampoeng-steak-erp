@@ -19,7 +19,7 @@ export default function OutletsPage() {
   const { outlets, employees, sales, loading, refreshData } = useSupabase();
   const [isCreateOpen, setIsCreateOpen] = useState<boolean>(false);
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
-  const [selectedOutlet, setSelectedOutlet] = useState<any>(null);
+  const [selectedOutlet, setSelectedOutlet] = useState<Database['public']['Tables']['outlets']['Row'] | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // Form states for create
@@ -133,7 +133,7 @@ export default function OutletsPage() {
   };
 
   // Open edit dialog
-  const openEditDialog = (outlet: any): void => {
+  const openEditDialog = (outlet: Database['public']['Tables']['outlets']['Row']): void => {
     setSelectedOutlet(outlet);
     setEditForm({
       name: outlet.name,
