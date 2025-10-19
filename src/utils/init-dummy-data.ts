@@ -1,15 +1,59 @@
 'use client';
 
 import { Timestamp } from 'spacetimedb';
-import type { DbConnection } from '../spacetime_module_bindings';
-import { 
-  OutletStatus, 
-  EmploymentStatus, 
-  CandidateStatus, 
-  AssetStatus,
-  TransferStatus,
-  DiscountType
-} from '../spacetime_module_bindings';
+import { Database } from '@/lib/supabase/types';
+
+// Define const enums based on the database types
+export const enum OutletStatus {
+  Open = 'Open',
+  Closed = 'Closed',
+  Renovation = 'Renovation'
+}
+
+export const enum EmploymentStatus {
+  Active = 'Active',
+  Inactive = 'Inactive'
+}
+
+export const enum CandidateStatus {
+  Applied = 'Applied',
+  Interview = 'Interview',
+  Hired = 'Hired',
+  Rejected = 'Rejected'
+}
+
+export const enum AssetStatus {
+  InUse = 'InUse',
+  Maintenance = 'Maintenance',
+  Broken = 'Broken'
+}
+
+export const enum TransferStatus {
+  Pending = 'Pending',
+  InTransit = 'InTransit',
+  Delivered = 'Delivered'
+}
+
+export const enum DiscountType {
+  Percentage = 'Percentage',
+  Fixed = 'Fixed'
+}
+
+type DbConnection = {
+  reducers: {
+    createOutlet: (name: string, area: string, address: string, status: Database['public']['Tables']['outlets']['Row']['status']) => void;
+    addSupplier: (name: string, contact: string, address: string, rating: number) => void;
+    createProduct: (name: string, category: string, price: bigint, desc: string) => void;
+    addIngredient: (name: string, unit: string, minStock: bigint, currentStock: bigint, outletId: bigint) => void;
+    createEmployee: (name: string, position: string, outletId: bigint, salary: bigint, status: Database['public']['Tables']['employees']['Row']['status'], joinDate: Timestamp) => void;
+    addCandidate: (name: string, email: string, phone: string, position: string, status: Database['public']['Tables']['candidates']['Row']['status'], outletId: bigint, applyDate: Timestamp) => void;
+    addAsset: (name: string, outletId: bigint, purchaseDate: Timestamp, lastMaintenance: Timestamp, status: Database['public']['Tables']['assets']['Row']['status']) => void;
+    createPromotion: (name: string, type: Database['public']['Tables']['promotions']['Row']['discount_type'], amount: bigint, startDate: Timestamp, endDate: Timestamp, outletIds: string) => void;
+    createTransfer: (fromOutlet: bigint, toOutlet: bigint, ingredientId: bigint, amount: bigint, status: Database['public']['Tables']['distributions']['Row']['status'], requestedBy: bigint, requestDate: Timestamp) => void;
+    createDailyChecklist: (outletId: bigint, checkDate: Timestamp, employeeId: bigint, notes: string) => void;
+    createShift: (employeeId: bigint, outletId: bigint, startTime: Timestamp, endTime: Timestamp, scheduleDate: Timestamp) => void;
+  };
+};
 
 /**
  * Initialize dummy data for Kampoeng Steak ERP System
@@ -192,7 +236,7 @@ export async function initializeDummyData(connection: DbConnection): Promise<voi
     
     connection.reducers.createPromotion(
       'Promo Ultah - Potongan Rp 50.000',
-      DiscountType.Amount,
+      DiscountType.Fixed,
       BigInt(5000000),
       Timestamp.fromDate(new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)),
       Timestamp.fromDate(new Date(Date.now() + 40 * 24 * 60 * 60 * 1000)),
@@ -218,7 +262,7 @@ export async function initializeDummyData(connection: DbConnection): Promise<voi
       BigInt(3),
       BigInt(4),
       BigInt(10),
-      TransferStatus.Completed,
+      TransferStatus.Delivered,
       BigInt(1),
       Timestamp.now()
     );
