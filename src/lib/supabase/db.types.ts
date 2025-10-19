@@ -1,6 +1,17 @@
+export type SupabasePaymentMethod = 'Cash' | 'Debit' | 'Credit' | 'QRIS' | 'Ewallet';
 export type SupabasePurchaseOrderStatus = 'Pending' | 'Approved' | 'Rejected';
 export type SupabaseDistributionStatus = 'Pending' | 'InTransit' | 'Delivered';
 export type SupabaseInventoryStatus = 'Critical' | 'Low' | 'Normal';
+export type SupabasePaymentMethod = 'Cash' | 'Debit' | 'Credit' | 'QRIS' | 'Ewallet';
+
+export interface SupabaseSale {
+  id: number;
+  outlet_id: number;
+  cashier_name: string;
+  total: number;
+  payment_method: SupabasePaymentMethod;
+  created_at: string;
+}
 
 export interface SupabasePurchaseOrder {
   id: number;
@@ -46,7 +57,12 @@ export interface SupabaseSupplier {
   created_at: string;
 }
 
-export type Tables = {
+export interface Tables {
+  sales: {
+    Row: SupabaseSale;
+    Insert: Omit<SupabaseSale, 'id' | 'created_at'>;
+    Update: Partial<Omit<SupabaseSale, 'id' | 'created_at'>>;
+  };
   purchase_orders: {
     Row: SupabasePurchaseOrder;
     Insert: Omit<SupabasePurchaseOrder, 'id' | 'created_at'>;
@@ -62,4 +78,23 @@ export type Tables = {
     Insert: Omit<SupabaseIngredient, 'id' | 'created_at'>;
     Update: Partial<Omit<SupabaseIngredient, 'id' | 'created_at'>>;
   };
-};
+  outlets: {
+    Row: SupabaseOutlet;
+    Insert: Omit<SupabaseOutlet, 'id' | 'created_at'>;
+    Update: Partial<Omit<SupabaseOutlet, 'id' | 'created_at'>>;
+  };
+  suppliers: {
+    Row: SupabaseSupplier;
+    Insert: Omit<SupabaseSupplier, 'id' | 'created_at'>;
+    Update: Partial<Omit<SupabaseSupplier, 'id' | 'created_at'>>;
+  };
+}
+
+export interface Database {
+  public: {
+    Tables: Tables;
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+  };
+}
