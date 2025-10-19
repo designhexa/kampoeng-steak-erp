@@ -11,16 +11,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Warehouse, TruckIcon, Package, CheckCircle, Plus, ArrowUpDown } from 'lucide-react';
 import { useSupabase } from '@/contexts/supabase-context';
-import { supabase } from '@/lib/supabase/client';
-import type { Database } from '@/lib/supabase/types';
-
-type DistributionStatus = 'Pending' | 'InTransit' | 'Delivered';
-
-type Distribution = Database['public']['Tables']['distributions']['Row'];
+import { supabase } from '@/lib/supabase/typed-client';
+import type { SupabaseDistribution, SupabaseDistributionStatus } from '@/lib/supabase/db.types';
 
 export default function DistribusiPage() {
   const { outlets, ingredients, loading, refreshData } = useSupabase();
-  const [distributions, setDistributions] = useState<Distribution[]>([]);
+  const [distributions, setDistributions] = useState<SupabaseDistribution[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [selectedOutlet, setSelectedOutlet] = useState<number>(0);
@@ -95,17 +91,17 @@ export default function DistribusiPage() {
     setIsSubmitting(true);
 
     try {
-      const insertData: Database['public']['Tables']['distributions']['Insert'] = {
+      const data: Omit<SupabaseDistribution, 'id' | 'created_at'> = {
         from_outlet_id: parseInt(addForm.from_outlet_id),
         to_outlet_id: parseInt(addForm.to_outlet_id),
         ingredient_name: ingredients.find(i => i.id.toString() === addForm.ingredient_id)?.name || '',
         quantity: parseInt(addForm.quantity),
-        status: 'Pending'
+        status: 'Pending' as const
       };
-      
-      const { error } = await (supabase
+
+      const { error } = await supabase
         .from('distributions')
-        .insert(insertData as any) as unknown as Promise<{ data: any; error: any }>);
+        .insert(data);
 
       if (error) throw error;
 
@@ -123,14 +119,13 @@ export default function DistribusiPage() {
 
   const handleMarkDelivered = async (distributionId: number): Promise<void> => {
     try {
-      const updateData: Database['public']['Tables']['distributions']['Update'] = {
-        status: 'Delivered'
+      const data: Partial<Omit<SupabaseDistribution, 'id' | 'created_at'>> = { 
+        status: 'Delivered' as const 
       };
-
-      const { error } = await (supabase
+      const { error } = await supabase
         .from('distributions')
-        .update(updateData)
-        .eq('id', distributionId) as unknown as Promise<{ data: any; error: any }>);
+        .update(data)
+        .eq('id', distributionId);
 
       if (error) throw error;
 
