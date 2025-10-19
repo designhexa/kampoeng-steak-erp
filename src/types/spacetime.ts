@@ -2,12 +2,12 @@ import { BinaryWriter } from './common';
 
 export interface DbConnectionBase {
   callReducer(name: string, args: Uint8Array, flags: string): void;
-  onReducer(name: string, callback: Function): void;
-  offReducer(name: string, callback: Function): void;
+  onReducer(name: string, callback: (args: unknown) => void): void;
+  offReducer(name: string, callback: (args: unknown) => void): void;
 }
 
 export type DbConnection = DbConnectionBase & {
-  tables: Record<string, any>;
+  tables: Record<string, unknown>;
 };
 
 export type DbConnectionImpl = DbConnectionBase & {
@@ -27,8 +27,8 @@ export interface ClientCache {
 }
 
 export interface SubscriptionBuilder {
-  onTableChange(tableName: string, callback: Function): SubscriptionBuilder;
-  onReducerCall(reducerName: string, callback: Function): SubscriptionBuilder;
+  onTableChange(tableName: string, callback: (data: unknown) => void): SubscriptionBuilder;
+  onReducerCall(reducerName: string, callback: (data: unknown) => void): SubscriptionBuilder;
   build(): void;
 }
 

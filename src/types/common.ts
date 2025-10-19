@@ -1,7 +1,10 @@
 // Base types
 export type __Timestamp = Date | string;
 export type CallReducerFlags = 'FullUpdate' | 'NoUpdate';
-export type BinaryWriter = any;
+export interface BinaryWriter {
+  write(data: Uint8Array): void;
+  flush(): void;
+}
 
 export type { 
   DbConnection,
