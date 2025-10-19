@@ -24,9 +24,16 @@ export default function Dashboard() {
     return <LoadingComponent />;
   }
 
+  // Helper function to determine stock status
+  const getStockStatus = (stock: number) => {
+    if (stock <= 10) return 'Critical';
+    if (stock <= 30) return 'Low';
+    return 'Normal';
+  };
+
   const totalRevenue = sales.reduce((sum, sale) => sum + sale.total, 0);
   const avgTransactionValue = sales.length > 0 ? totalRevenue / sales.length : 0;
-  const criticalStockCount = ingredients.filter(i => i.status === 'Critical').length;
+  const criticalStockCount = ingredients.filter(i => getStockStatus(i.stock) === 'Critical').length;
   const activeOutlets = outlets.filter(o => o.status === 'Open').length;
   const activeEmployees = employees.filter(e => e.status === 'Active').length;
 
