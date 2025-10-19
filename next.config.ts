@@ -1,20 +1,19 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  // Use a custom build directory to avoid issues with a locked `.next` folder
-  distDir: '.next',
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  },
+  images: {
+    domains: ['localhost', 'supabase.co'],
+  },
+  // Untuk memastikan aplikasi bisa di-deploy ke Netlify
   output: 'standalone',
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        ws: false,
-        'utf-8-validate': false,
-        'bufferutil': false
-      };
-    }
-    return config;
-  }
-};
+  // Mengoptimalkan build
+  swcMinify: true,
+  reactStrictMode: true,
+}
 
-export default nextConfig;
+export default nextConfig
