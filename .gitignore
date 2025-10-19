@@ -1,0 +1,34 @@
+node_modules
+
+# Next.js
+.next/
+build/
+out/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs/
+*.log
+
+# Misc
+.vscode/
+.idea/
+
+# Rust (spacetime-server)
+/spacetime-server/target/
+/spacetime-server/debug/
+debug/
+target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+/.spacetime
+
+# Generated trace
+build/trace
