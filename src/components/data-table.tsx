@@ -1,6 +1,6 @@
 import { useQuery } from '@/lib/supabase/hooks'
 import type { Database } from '@/lib/supabase/database.types'
-import { useEffect, useState } from 'react'
+import { type ReactElement } from 'react'
 
 type Tables = Database['public']['Tables']
 type TableName = keyof Tables
@@ -16,7 +16,7 @@ interface DataTableProps<T extends TableName> {
 
 export function DataTable<T extends TableName>({ table, columns }: DataTableProps<T>) {
   const { data, loading: isLoading, error } = useQuery(table, {
-    orderBy: 'created_at' as any,
+    orderBy: 'created_at' as keyof Row<T>,
     orderDirection: 'desc'
   })
 
