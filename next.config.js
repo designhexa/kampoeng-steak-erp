@@ -1,10 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    // This enables experimental features in Supabase client
+    // Enables experimental features in Supabase client
     serverActions: true,
   },
-  // Enforce strict type checking and linting during build
+  output: 'standalone', // 🔥 penting untuk Netlify agar SSR jalan
   typescript: {
     ignoreBuildErrors: false,
   },
@@ -12,3 +12,5 @@ const nextConfig = {
     ignoreDuringBuilds: false,
   },
 }
+
+module.exports = nextConfig
