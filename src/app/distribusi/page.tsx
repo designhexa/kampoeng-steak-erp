@@ -12,7 +12,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Warehouse, TruckIcon, Package, CheckCircle, Plus, ArrowUpDown } from 'lucide-react';
 import { useSupabase } from '@/contexts/supabase-context';
 import { supabase } from '@/lib/supabase/typed-client';
-import type { SupabaseDistribution, SupabaseDistributionStatus } from '@/lib/supabase/db.types';
+import type { Database } from '@/lib/supabase/types';
+type Tables = Database['public']['Tables'];
+
+type SupabaseDistribution = Tables['distributions']['Row'];
+type SupabaseDistributionStatus = Tables['distributions']['Row']['status'];
 
 export default function DistribusiPage() {
   const { outlets, ingredients, loading, refreshData } = useSupabase();
