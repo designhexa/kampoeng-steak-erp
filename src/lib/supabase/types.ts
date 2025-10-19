@@ -124,6 +124,7 @@ export interface Database {
         Row: {
           id: number
           outlet_id: number
+          cashier_name: string
           total: number
           payment_method: 'Cash' | 'Debit' | 'Credit' | 'QRIS' | 'Ewallet'
           created_at: string
@@ -131,6 +132,7 @@ export interface Database {
         Insert: {
           id?: number
           outlet_id: number
+          cashier_name: string
           total: number
           payment_method: 'Cash' | 'Debit' | 'Credit' | 'QRIS' | 'Ewallet'
           created_at?: string
@@ -138,6 +140,7 @@ export interface Database {
         Update: {
           id?: number
           outlet_id?: number
+          cashier_name?: string
           total?: number
           payment_method?: 'Cash' | 'Debit' | 'Credit' | 'QRIS' | 'Ewallet'
           created_at?: string

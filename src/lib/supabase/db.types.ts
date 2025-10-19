@@ -1,4 +1,3 @@
-export type SupabasePaymentMethod = 'Cash' | 'Debit' | 'Credit' | 'QRIS' | 'Ewallet';
 export type SupabasePurchaseOrderStatus = 'Pending' | 'Approved' | 'Rejected';
 export type SupabaseDistributionStatus = 'Pending' | 'InTransit' | 'Delivered';
 export type SupabaseInventoryStatus = 'Critical' | 'Low' | 'Normal';
