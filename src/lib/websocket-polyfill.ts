@@ -18,10 +18,10 @@ class WebSocketPolyfill implements WebSocket {
   private _readyState: number = WebSocketPolyfill.CONNECTING;
   private _ws: WebSocket | null = null;
 
-  onopen: ((ev: Event) => any) | null = null;
-  onclose: ((ev: CloseEvent) => any) | null = null;
-  onerror: ((ev: Event) => any) | null = null;
-  onmessage: ((ev: MessageEvent) => any) | null = null;
+  onopen: ((ev: Event) => void) | null = null;
+  onclose: ((ev: CloseEvent) => void) | null = null;
+  onerror: ((ev: Event) => void) | null = null;
+  onmessage: ((ev: MessageEvent) => void) | null = null;
 
   constructor(url: string | URL, protocols?: string | string[]) {
     this.url = url.toString();
@@ -110,16 +110,16 @@ class WebSocketPolyfill implements WebSocket {
       // Store listeners in case we get a WebSocket later
       switch (type) {
         case 'open':
-          this.onopen = listener as (ev: Event) => any;
+          this.onopen = listener as (ev: Event) => void;
           break;
         case 'close':
-          this.onclose = listener as (ev: CloseEvent) => any;
+          this.onclose = listener as (ev: CloseEvent) => void;
           break;
         case 'error':
-          this.onerror = listener as (ev: Event) => any;
+          this.onerror = listener as (ev: Event) => void;
           break;
         case 'message':
-          this.onmessage = listener as (ev: MessageEvent) => any;
+          this.onmessage = listener as (ev: MessageEvent) => void;
           break;
       }
     }
