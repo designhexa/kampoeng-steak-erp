@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
-import type { Database } from '@/lib/supabase/types';
+import type { Database } from '@/lib/supabase/database.types';
 
 type Tables = Database['public']['Tables'];
 
@@ -129,6 +129,23 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
       if (cashFlowRes.error) throw cashFlowRes.error;
       if (usersRes.error) throw usersRes.error;
 
+      // Log data structure for debugging
+      console.log('Outlets:', outletsRes.data?.[0]);
+      console.log('Employees:', employeesRes.data?.[0]);
+      console.log('Products:', productsRes.data?.[0]);
+      console.log('Ingredients:', ingredientsRes.data?.[0]);
+      console.log('Sales:', salesRes.data?.[0]);
+      console.log('Suppliers:', suppliersRes.data?.[0]);
+      console.log('Purchase Orders:', purchaseOrdersRes.data?.[0]);
+      console.log('Distributions:', distributionsRes.data?.[0]);
+      console.log('Daily Checklists:', dailyChecklistsRes.data?.[0]);
+      console.log('Shift Reports:', shiftReportsRes.data?.[0]);
+      console.log('Candidates:', candidatesRes.data?.[0]);
+      console.log('Promotions:', promotionsRes.data?.[0]);
+      console.log('Assets:', assetsRes.data?.[0]);
+      console.log('Cash Flow:', cashFlowRes.data?.[0]);
+      console.log('Users:', usersRes.data?.[0]);
+
       // Set data
       setOutlets(outletsRes.data || []);
       setEmployees(employeesRes.data || []);
@@ -158,29 +175,31 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
 
   // Initial data fetch
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    void fetchData();
+  }, []);
 
   // Setup real-time subscriptions for all tables
   useEffect(() => {
     if (!isConfigured || !isConnected) return;
 
+    const handleChange = () => void fetchData();
+
     const channels = [
-      supabase.channel('outlets-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'outlets' }, () => fetchData()).subscribe(),
-      supabase.channel('employees-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'employees' }, () => fetchData()).subscribe(),
-      supabase.channel('products-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => fetchData()).subscribe(),
-      supabase.channel('ingredients-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'ingredients' }, () => fetchData()).subscribe(),
-      supabase.channel('sales-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'sales' }, () => fetchData()).subscribe(),
-      supabase.channel('suppliers-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'suppliers' }, () => fetchData()).subscribe(),
-      supabase.channel('purchase_orders-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'purchase_orders' }, () => fetchData()).subscribe(),
-      supabase.channel('distributions-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'distributions' }, () => fetchData()).subscribe(),
-      supabase.channel('daily_checklists-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'daily_checklists' }, () => fetchData()).subscribe(),
-      supabase.channel('shift_reports-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'shift_reports' }, () => fetchData()).subscribe(),
-      supabase.channel('candidates-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'candidates' }, () => fetchData()).subscribe(),
-      supabase.channel('promotions-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'promotions' }, () => fetchData()).subscribe(),
-      supabase.channel('assets-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'assets' }, () => fetchData()).subscribe(),
-      supabase.channel('cash_flow-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'cash_flow' }, () => fetchData()).subscribe(),
-      supabase.channel('users-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => fetchData()).subscribe(),
+      supabase.channel('outlets-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'outlets' }, handleChange).subscribe(),
+      supabase.channel('employees-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'employees' }, handleChange).subscribe(),
+      supabase.channel('products-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, handleChange).subscribe(),
+      supabase.channel('ingredients-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'ingredients' }, handleChange).subscribe(),
+      supabase.channel('sales-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'sales' }, handleChange).subscribe(),
+      supabase.channel('suppliers-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'suppliers' }, handleChange).subscribe(),
+      supabase.channel('purchase_orders-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'purchase_orders' }, handleChange).subscribe(),
+      supabase.channel('distributions-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'distributions' }, handleChange).subscribe(),
+      supabase.channel('daily_checklists-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'daily_checklists' }, handleChange).subscribe(),
+      supabase.channel('shift_reports-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'shift_reports' }, handleChange).subscribe(),
+      supabase.channel('candidates-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'candidates' }, handleChange).subscribe(),
+      supabase.channel('promotions-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'promotions' }, handleChange).subscribe(),
+      supabase.channel('assets-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'assets' }, handleChange).subscribe(),
+      supabase.channel('cash_flow-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'cash_flow' }, handleChange).subscribe(),
+      supabase.channel('users-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, handleChange).subscribe(),
     ];
 
     return () => {
