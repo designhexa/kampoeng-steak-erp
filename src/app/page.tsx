@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { CollapsibleSidebar } from '@/components/collapsible-sidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,81 +9,22 @@ import {
   Store, Package, Users, TrendingUp, ShoppingCart, 
   DollarSign, AlertTriangle, CheckCircle2, Clock
 } from 'lucide-react';
+import { LoadingComponent, SetupComponent } from '@/components/ui/loading';
 import { useSupabase } from '@/contexts/supabase-context';
-import { sdk } from "@farcaster/miniapp-sdk";
 
 export default function Dashboard() {
   const router = useRouter();
   const { outlets = [], employees = [], sales = [], ingredients = [], isConnected, isConfigured, loading } = useSupabase();
 
-  useEffect(() => {
-    const initializeFarcaster = async () => {
-      try {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        if (document.readyState !== 'complete') {
-          await new Promise(resolve => {
-            if (document.readyState === 'complete') {
-              resolve(void 0);
-            } else {
-              window.addEventListener('load', () => resolve(void 0), { once: true });
-            }
-          });
-        }
-        await sdk.actions.ready();
-        console.log("Farcaster SDK initialized successfully - app fully loaded");
-      } catch (error) {
-        console.error('Failed to initialize Farcaster SDK:', error);
-        setTimeout(async () => {
-          try {
-            await sdk.actions.ready();
-            console.log('Farcaster SDK initialized on retry');
-          } catch (retryError) {
-            console.error('Farcaster SDK retry failed:', retryError);
-          }
-        }, 1000);
-      }
-    };
-    initializeFarcaster();
-  }, []);
-
   if (!isConfigured) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
-        <Card className="w-full max-w-2xl">
-          <CardHeader>
-            <CardTitle className="text-xl md:text-2xl">⚙️ Supabase Setup Required</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm md:text-base text-gray-600">
-              Untuk menggunakan Kampoeng Steak ERP System, Anda perlu setup Supabase database terlebih dahulu.
-            </p>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-semibold mb-2 text-sm md:text-base">📋 Quick Setup (5 menit):</h3>
-              <ol className="list-decimal list-inside space-y-2 text-xs md:text-sm">
-                <li>Buat project gratis di <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">supabase.com</a></li>
-                <li>Copy Project URL dan anon key</li>
-                <li>Hardcode credentials di file src/lib/supabase/client.ts</li>
-                <li>Jalankan SQL schema di Supabase SQL Editor</li>
-              </ol>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <SetupComponent />;
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-sm md:text-base text-gray-600">Loading dashboard...</p>
-        </div>
-      </div>
-    );
+    return <LoadingComponent />;
   }
 
-  const totalRevenue = sales.reduce((sum, sale) => sum + sale.total_amount, 0);
+  const totalRevenue = sales.reduce((sum, sale) => sum + sale.total, 0);
   const avgTransactionValue = sales.length > 0 ? totalRevenue / sales.length : 0;
   const criticalStockCount = ingredients.filter(i => i.status === 'Critical').length;
   const activeOutlets = outlets.filter(o => o.status === 'Open').length;

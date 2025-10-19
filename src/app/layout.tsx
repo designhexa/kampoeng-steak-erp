@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { Providers } from '@/components/providers/auth-providers';
 import './globals.css';
-import { AuthProvider } from '../contexts/auth-context';
-import { SupabaseProvider } from '../contexts/supabase-context';
-import FarcasterWrapper from "@/components/FarcasterWrapper";
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -21,20 +19,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-        <html lang="id">
-          <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-            <SupabaseProvider>
-              <AuthProvider>
-                
-        <FarcasterWrapper>
+    <html lang="id">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <Providers>
           {children}
-        </FarcasterWrapper>
-        
-              </AuthProvider>
-            </SupabaseProvider>
-          </body>
-        </html>
-      );
+        </Providers>
+      </body>
+    </html>
+  );
 }
 
 export const metadata: Metadata = {
