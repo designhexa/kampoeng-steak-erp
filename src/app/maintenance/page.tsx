@@ -13,17 +13,8 @@ import { Wrench, Plus, AlertCircle, CheckCircle, Clock } from 'lucide-react';
 import { useSupabase } from '@/contexts/supabase-context';
 import { supabase } from '@/lib/supabase/client';
 
-type AssetStatus = 'InUse' | 'Maintenance' | 'Broken';
-
-interface Asset {
-  id: number;
-  name: string;
-  outlet_id: number;
-  purchase_date: string;
-  last_maintenance: string;
-  status: AssetStatus;
-  created_at: string;
-}
+import type { Database } from '@/lib/supabase/types';
+type Asset = Database['public']['Tables']['assets']['Row'];
 
 export default function MaintenancePage() {
   const { outlets, loading } = useSupabase();
@@ -34,7 +25,6 @@ export default function MaintenancePage() {
   const [formData, setFormData] = useState({
     name: '',
     outletId: '',
-    purchaseDate: '',
   });
 
   React.useEffect(() => {
@@ -71,14 +61,13 @@ export default function MaintenancePage() {
       const { error } = await supabase.from('assets').insert({
         name: formData.name,
         outlet_id: parseInt(formData.outletId),
-        purchase_date: formData.purchaseDate,
         last_maintenance: new Date().toISOString(),
         status: 'InUse',
       });
 
       if (error) throw error;
 
-      setFormData({ name: '', outletId: '', purchaseDate: '' });
+      setFormData({ name: '', outletId: '' });
       setIsDialogOpen(false);
       await fetchAssets();
     } catch (error) {
@@ -89,7 +78,7 @@ export default function MaintenancePage() {
     }
   };
 
-  const updateAssetStatus = async (assetId: number, newStatus: AssetStatus): Promise<void> => {
+  const updateAssetStatus = async (assetId: number, newStatus: Asset['status']): Promise<void> => {
     try {
       const { error } = await supabase
         .from('assets')
@@ -168,17 +157,6 @@ export default function MaintenancePage() {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="purchaseDate">Tanggal Pembelian</Label>
-                  <Input
-                    id="purchaseDate"
-                    type="date"
-                    value={formData.purchaseDate}
-                    onChange={(e) => setFormData({ ...formData, purchaseDate: e.target.value })}
-                    required
-                  />
-                </div>
-
                 <div className="flex justify-end gap-2">
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                     Batal
@@ -249,7 +227,7 @@ export default function MaintenancePage() {
                     <TableRow className="border-blue-200">
                       <TableHead className="text-[#163681]">Nama Aset</TableHead>
                       <TableHead className="text-[#163681]">Outlet</TableHead>
-                      <TableHead className="text-[#163681]">Tanggal Beli</TableHead>
+                      <TableHead className="text-[#163681]">Tanggal Registrasi</TableHead>
                       <TableHead className="text-[#163681]">Maintenance Terakhir</TableHead>
                       <TableHead className="text-[#163681]">Status</TableHead>
                       <TableHead className="text-[#163681]">Aksi</TableHead>
@@ -262,7 +240,7 @@ export default function MaintenancePage() {
                         <TableRow key={asset.id} className="border-blue-100">
                           <TableCell className="font-medium text-[#163681]">{asset.name}</TableCell>
                           <TableCell className="text-[#163681]/70">{outlet?.name || 'Unknown'}</TableCell>
-                          <TableCell className="text-[#163681]/70">{new Date(asset.purchase_date).toLocaleDateString('id-ID')}</TableCell>
+                          <TableCell className="text-[#163681]/70">{new Date(asset.created_at).toLocaleDateString('id-ID')}</TableCell>
                           <TableCell className="text-[#163681]/70">{new Date(asset.last_maintenance).toLocaleDateString('id-ID')}</TableCell>
                           <TableCell>
                             <span
