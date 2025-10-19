@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
-  Truck, FileText, CheckCircle, XCircle, Clock
+  Truck, FileText, CheckCircle, Clock
 } from 'lucide-react';
 import { useSupabase } from '@/contexts/supabase-context';
 
@@ -125,7 +125,7 @@ export default function PembelianDashboard() {
                               </Badge>
                             </td>
                             <td className="px-4 py-3 text-sm text-right font-medium">
-                              Rp {po.total_amount.toLocaleString('id-ID')}
+                              Rp {po.total.toLocaleString('id-ID')}
                             </td>
                           </tr>
                         ))}
