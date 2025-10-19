@@ -1,0 +1,13 @@
+export type Role = 'AdminPusat' | 'AreaManager' | 'OutletManager' | 'Kasir' | 'HR' | 'Gudang' | 'Finance';
+export type OutletStatus = 'Open' | 'Closed' | 'Renovation';
+export type EmploymentStatus = 'Active' | 'Inactive';
+export type IngredientStatus = 'Critical' | 'Low' | 'Normal';
+export type PaymentMethod = 'Cash' | 'Debit' | 'Credit' | 'QRIS' | 'Ewallet';
+export type PurchaseOrderStatus = 'Pending' | 'Approved' | 'Rejected';
+export type DistributionStatus = 'Pending' | 'InTransit' | 'Delivered';
+export type ShiftStatus = 'Open' | 'Closed';
+export type CandidateStatus = 'Applied' | 'Interview' | 'Hired' | 'Rejected';
+export type PromotionStatus = 'Active' | 'Upcoming' | 'Expired';
+export type AssetStatus = 'InUse' | 'Maintenance' | 'Broken';
+export type CashFlowType = 'Inflow' | 'Outflow';
+export type DiscountType = 'Percentage' | 'Fixed';
