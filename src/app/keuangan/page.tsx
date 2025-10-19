@@ -218,12 +218,11 @@ export default function KeuanganPage() {
                   <XAxis 
                     dataKey="category" 
                     tick={{ fill: '#163681', fontSize: 12 }}
-                    axisLine={{ strokeWidth: 1 }}
-                    axisLine={{ stroke: '#e0e7ff' }}
+                    axisLine={{ stroke: '#e0e7ff', strokeWidth: 1 }}
                   />
                   <YAxis 
                     tick={{ fill: '#163681', fontSize: 12 }}
-                    axisLine={{ stroke: '#e0e7ff' }}
+                    axisLine={{ stroke: '#e0e7ff', strokeWidth: 1 }}
                     tickFormatter={(value) => `Rp ${Number(value).toLocaleString('id-ID')}`}
                     offset={5}
                   />
