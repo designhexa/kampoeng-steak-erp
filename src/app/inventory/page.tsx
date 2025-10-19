@@ -11,8 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Package, AlertTriangle, TrendingDown, TrendingUp, Plus } from 'lucide-react';
 import { useSupabase } from '@/contexts/supabase-context';
-import { supabase } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/typed-client';
 import type { Database } from '@/lib/supabase/types';
+type Tables = Database['public']['Tables'];
 
 export default function InventoryPage() {
   const { ingredients, outlets, loading, refreshData } = useSupabase();
@@ -62,14 +63,14 @@ export default function InventoryPage() {
       const stock = parseInt(addForm.stock);
       const minStock = parseInt(addForm.min_stock);
       
-      let status: Database['public']['Tables']['ingredients']['Row']['status'] = 'Normal';
+      let status: Tables['ingredients']['Row']['status'] = 'Normal';
       if (stock < minStock) {
         status = 'Critical';
       } else if (stock < minStock * 2) {
         status = 'Low';
       }
 
-      const insertData: Database['public']['Tables']['ingredients']['Insert'] = {
+      const data: Tables['ingredients']['Insert'] = {
         name: addForm.name,
         outlet_id: parseInt(addForm.outlet_id),
         stock: stock,
@@ -78,9 +79,9 @@ export default function InventoryPage() {
         status: status
       };
 
-      const { error } = await (supabase
+      const { error } = await supabase
         .from('ingredients')
-        .insert(insertData as any) as unknown as Promise<{ data: any; error: any }>);
+        .insert(data);
 
       if (error) throw error;
 
@@ -100,22 +101,22 @@ export default function InventoryPage() {
       const ingredient = ingredients.find(i => i.id === ingredientId);
       if (!ingredient) return;
 
-      let newStatus: Database['public']['Tables']['ingredients']['Row']['status'] = 'Normal';
+      let newStatus: Tables['ingredients']['Row']['status'] = 'Normal';
       if (newStock < ingredient.min_stock) {
         newStatus = 'Critical';
       } else if (newStock < ingredient.min_stock * 2) {
         newStatus = 'Low';
       }
 
-      const updateData: Database['public']['Tables']['ingredients']['Update'] = {
+      const data: Tables['ingredients']['Update'] = {
         stock: newStock,
         status: newStatus
       };
 
-      const { error } = await (supabase
+      const { error } = await supabase
         .from('ingredients')
-        .update(updateData)
-        .eq('id', ingredientId) as unknown as Promise<{ data: any; error: any }>);
+        .update(data)
+        .eq('id', ingredientId);
 
       if (error) throw error;
 
