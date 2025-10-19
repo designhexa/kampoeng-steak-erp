@@ -75,6 +75,7 @@ export default function POSPage() {
     try {
       const { error } = await supabase.from('sales').insert({
         outlet_id: selectedOutlet,
+        cashier_name: 'Kasir', // Placeholder until we implement authentication
         total: cartTotal,
         payment_method: paymentMethod,
       });
