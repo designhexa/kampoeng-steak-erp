@@ -1,6 +1,6 @@
 import { Database } from './types';
 import { supabase } from './typed-client';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { PostgrestError } from '@supabase/supabase-js';
 
 type Tables = Database['public']['Tables'];
 
@@ -8,12 +8,14 @@ export async function insertData<T extends keyof Tables>(
   table: T,
   data: Tables[T]['Insert']
 ): Promise<{
-  error: Error | null;
+  data: Tables[T]['Row'] | null;
+  error: PostgrestError | null;
 }> {
-  const { error } = await supabase
+  return await supabase
     .from(table)
-    .insert(data as any) as { error: Error | null };
-  return { error };
+    .insert([data])
+    .select()
+    .single();
 }
 
 export async function updateData<T extends keyof Tables>(
@@ -21,13 +23,15 @@ export async function updateData<T extends keyof Tables>(
   data: Tables[T]['Update'],
   id: number
 ): Promise<{
-  error: Error | null;
+  data: Tables[T]['Row'] | null;
+  error: PostgrestError | null;
 }> {
-  const { error } = await supabase
+  return await supabase
     .from(table)
-    .update(data as any)
-    .eq('id', id as any) as { error: Error | null };
-  return { error };
+    .update(data)
+    .eq('id', id)
+    .select()
+    .single();
 }
 
 export async function fetchData<T extends keyof Tables>(
@@ -40,9 +44,11 @@ export async function fetchData<T extends keyof Tables>(
   }
 ): Promise<{
   data: Tables[T]['Row'][] | null;
-  error: Error | null;
+  error: PostgrestError | null;
 }> {
-  let query = supabase.from(table).select('*');
+  let query = supabase
+    .from(table)
+    .select();
 
   if (options?.orderBy) {
     query = query.order(options.orderBy, {
@@ -61,10 +67,4 @@ export async function fetchData<T extends keyof Tables>(
     );
   }
 
-  const { data, error } = await query as {
-    data: Tables[T]['Row'][] | null;
-    error: Error | null;
-  };
-  
-  return { data, error };
-}
+  return await query;
