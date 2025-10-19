@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
-import type { Database } from '@/lib/supabase/types';
+import type { Database } from '@/lib/supabase/db.types';
 
 type Tables = Database['public']['Tables'];
 
