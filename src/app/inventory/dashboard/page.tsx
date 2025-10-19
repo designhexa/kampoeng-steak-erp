@@ -15,9 +15,16 @@ export default function InventoryDashboard() {
   const router = useRouter();
   const { ingredients = [] } = useSupabase();
 
-  const criticalStock = ingredients.filter(i => i.status === 'Critical');
-  const lowStock = ingredients.filter(i => i.status === 'Low');
-  const availableStock = ingredients.filter(i => i.status === 'Normal');
+  // Helper function to determine stock status
+  const getStockStatus = (stock: number) => {
+    if (stock <= 10) return 'Critical';
+    if (stock <= 30) return 'Low';
+    return 'Normal';
+  };
+
+  const criticalStock = ingredients.filter(i => getStockStatus(i.stock) === 'Critical');
+  const lowStock = ingredients.filter(i => getStockStatus(i.stock) === 'Low');
+  const availableStock = ingredients.filter(i => getStockStatus(i.stock) === 'Normal');
 
   return (
     <div className="flex h-screen overflow-hidden">
