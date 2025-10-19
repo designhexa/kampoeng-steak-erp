@@ -11,8 +11,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TruckIcon, Clock, CheckCircle, XCircle, Plus, ThumbsUp, ThumbsDown, ArrowUpDown } from 'lucide-react';
 import { useSupabase } from '@/contexts/supabase-context';
-import { supabase } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/typed-client';
 import type { Database } from '@/lib/supabase/types';
+type Tables = Database['public']['Tables'];
+
+type PurchaseOrder = Tables['purchase_orders']['Row'];
+type PurchaseOrderInsert = Tables['purchase_orders']['Insert'];
+type PurchaseOrderUpdate = Tables['purchase_orders']['Update'];
 
 export default function PembelianPage() {
   const { purchaseOrders, suppliers, outlets, loading, refreshData } = useSupabase();
@@ -82,14 +87,16 @@ export default function PembelianPage() {
     setIsSubmitting(true);
 
     try {
-      const result = await (supabase
+      const data: PurchaseOrderInsert = {
+        outlet_id: parseInt(addForm.outlet_id),
+        supplier_id: parseInt(addForm.supplier_id),
+        total: parseInt(addForm.total),
+        status: 'Pending'
+      };
+
+      const result = await supabase
         .from('purchase_orders')
-        .insert([{
-          outlet_id: parseInt(addForm.outlet_id),
-          supplier_id: parseInt(addForm.supplier_id),
-          total: parseInt(addForm.total),
-          status: 'Pending'
-        }] as any) as unknown as Promise<{ data: any; error: any }>);
+        .insert([data]);
 
       if (result.error) throw result.error;
 
@@ -105,17 +112,15 @@ export default function PembelianPage() {
   };
 
   const handleApprove = async (poId: number): Promise<void> => {
-    try {
-      const updateData: Database['public']['Tables']['purchase_orders']['Update'] = {
+      try {
+      const data: PurchaseOrderUpdate = {
         status: 'Approved'
       };
 
-      const { error } = await (supabase
+      const { error } = await supabase
         .from('purchase_orders')
-        .update(updateData)
-        .eq('id', poId) as unknown as Promise<{ data: any; error: any }>);
-
-      if (error) throw error;
+        .update(data as any)
+        .eq('id', poId);      if (error) throw error;
 
       await refreshData();
     } catch (error) {
@@ -125,17 +130,15 @@ export default function PembelianPage() {
   };
 
   const handleReject = async (poId: number): Promise<void> => {
-    try {
-      const updateData: Database['public']['Tables']['purchase_orders']['Update'] = {
+      try {
+      const data: PurchaseOrderUpdate = {
         status: 'Rejected'
       };
 
-      const { error } = await (supabase
+      const { error } = await supabase
         .from('purchase_orders')
-        .update(updateData)
-        .eq('id', poId) as unknown as Promise<{ data: any; error: any }>);
-
-      if (error) throw error;
+        .update(data as any)
+        .eq('id', poId);      if (error) throw error;
 
       await refreshData();
     } catch (error) {
