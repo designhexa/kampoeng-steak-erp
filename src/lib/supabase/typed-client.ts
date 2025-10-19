@@ -15,5 +15,10 @@ export const supabase = createClient<Database>(
     db: {
       schema: 'public',
     },
+    global: {
+      headers: {
+        'x-typescript-types': 'true',
+      },
+    },
   }
 );
