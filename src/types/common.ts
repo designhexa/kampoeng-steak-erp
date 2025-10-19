@@ -26,7 +26,8 @@ export enum OutletStatus {
 export enum EmploymentStatus {
   Active = 'Active',
   Inactive = 'Inactive',
-  Terminated = 'Terminated'
+  Terminated = 'Terminated',
+  OnLeave = 'On Leave'
 }
 
 export enum CandidateStatus {
