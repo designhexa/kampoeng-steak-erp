@@ -3,7 +3,7 @@ const nextConfig = {
   experimental: {
     serverActions: true,
   },
-  // ❌ HAPUS: output: 'standalone',
+  srcDir: 'src',
   typescript: {
     ignoreBuildErrors: false,
   },
