@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import type { Database } from '@/lib/supabase/types';
 import { CollapsibleSidebar } from '@/components/collapsible-sidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -59,12 +60,16 @@ export default function OutletsPage() {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.from('outlets').insert({
+      const insertData = [{
         name: createForm.name,
         area: createForm.area,
         address: createForm.address,
-        status: 'Open',
-      });
+        status: 'Open' as const,
+      }]
+
+      const { error } = await supabase
+        .from('outlets')
+        .insert(insertData);
 
       if (error) throw error;
 
@@ -90,14 +95,16 @@ export default function OutletsPage() {
     setIsSubmitting(true);
 
     try {
+      const updateData = {
+        name: editForm.name,
+        area: editForm.area,
+        address: editForm.address,
+        status: editForm.status,
+      }
+
       const { error } = await supabase
         .from('outlets')
-        .update({
-          name: editForm.name,
-          area: editForm.area,
-          address: editForm.address,
-          status: editForm.status,
-        })
+        .update(updateData)
         .eq('id', selectedOutlet.id);
 
       if (error) throw error;
