@@ -15,12 +15,13 @@ import { supabase } from '@/lib/supabase/typed-client';
 import type { Database } from '@/lib/supabase/types';
 type Tables = Database['public']['Tables'];
 
-type SupabaseDistribution = Tables['distributions']['Row'];
-type SupabaseDistributionStatus = Tables['distributions']['Row']['status'];
+type Distribution = Database['public']['Tables']['distributions']['Row'];
+type DistributionInsert = Database['public']['Tables']['distributions']['Insert'];
+type DistributionUpdate = Database['public']['Tables']['distributions']['Update'];
 
 export default function DistribusiPage() {
   const { outlets, ingredients, loading, refreshData } = useSupabase();
-  const [distributions, setDistributions] = useState<SupabaseDistribution[]>([]);
+  const [distributions, setDistributions] = useState<Distribution[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [selectedOutlet, setSelectedOutlet] = useState<number>(0);
@@ -95,7 +96,7 @@ export default function DistribusiPage() {
     setIsSubmitting(true);
 
     try {
-      const data: Omit<SupabaseDistribution, 'id' | 'created_at'> = {
+      const data: DistributionInsert = {
         from_outlet_id: parseInt(addForm.from_outlet_id),
         to_outlet_id: parseInt(addForm.to_outlet_id),
         ingredient_name: ingredients.find(i => i.id.toString() === addForm.ingredient_id)?.name || '',
@@ -105,7 +106,7 @@ export default function DistribusiPage() {
 
       const { error } = await supabase
         .from('distributions')
-        .insert(data);
+        .insert(data);  // Supabase's typed client handles the array wrapping
 
       if (error) throw error;
 
@@ -123,7 +124,7 @@ export default function DistribusiPage() {
 
   const handleMarkDelivered = async (distributionId: number): Promise<void> => {
     try {
-      const data: Partial<Omit<SupabaseDistribution, 'id' | 'created_at'>> = { 
+      const data: DistributionUpdate = { 
         status: 'Delivered' as const 
       };
       const { error } = await supabase
