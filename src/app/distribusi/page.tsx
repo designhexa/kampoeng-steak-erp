@@ -12,18 +12,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Warehouse, TruckIcon, Package, CheckCircle, Plus, ArrowUpDown } from 'lucide-react';
 import { useSupabase } from '@/contexts/supabase-context';
 import { supabase } from '@/lib/supabase/client';
+import type { Database } from '@/lib/supabase/types';
 
 type DistributionStatus = 'Pending' | 'InTransit' | 'Delivered';
 
-interface Distribution {
-  id: number;
-  from_outlet_id: number;
-  to_outlet_id: number;
-  ingredient_id: number;
-  quantity: number;
-  status: DistributionStatus;
-  created_at: string;
-}
+type Distribution = Database['public']['Tables']['distributions']['Row'];
 
 export default function DistribusiPage() {
   const { outlets, ingredients, loading, refreshData } = useSupabase();
@@ -102,13 +95,17 @@ export default function DistribusiPage() {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.from('distributions').insert({
+      const insertData: Database['public']['Tables']['distributions']['Insert'] = {
         from_outlet_id: parseInt(addForm.from_outlet_id),
         to_outlet_id: parseInt(addForm.to_outlet_id),
-        ingredient_id: parseInt(addForm.ingredient_id),
+        ingredient_name: ingredients.find(i => i.id.toString() === addForm.ingredient_id)?.name || '',
         quantity: parseInt(addForm.quantity),
-        status: 'Pending',
-      });
+        status: 'Pending'
+      };
+      
+      const { error } = await (supabase
+        .from('distributions')
+        .insert(insertData as any) as unknown as Promise<{ data: any; error: any }>);
 
       if (error) throw error;
 
@@ -126,10 +123,14 @@ export default function DistribusiPage() {
 
   const handleMarkDelivered = async (distributionId: number): Promise<void> => {
     try {
-      const { error } = await supabase
+      const updateData: Database['public']['Tables']['distributions']['Update'] = {
+        status: 'Delivered'
+      };
+
+      const { error } = await (supabase
         .from('distributions')
-        .update({ status: 'Delivered' })
-        .eq('id', distributionId);
+        .update(updateData)
+        .eq('id', distributionId) as unknown as Promise<{ data: any; error: any }>);
 
       if (error) throw error;
 
@@ -346,15 +347,13 @@ export default function DistribusiPage() {
                     {filteredDistributions.map((dist) => {
                       const fromOutlet = outlets.find(o => o.id === dist.from_outlet_id);
                       const toOutlet = outlets.find(o => o.id === dist.to_outlet_id);
-                      const ingredient = ingredients.find(i => i.id === dist.ingredient_id);
-
                     return (
                       <TableRow key={dist.id}>
                         <TableCell className="font-medium text-[#163681]">#{dist.id}</TableCell>
                         <TableCell className="text-[#163681]/70">{fromOutlet?.name || '-'}</TableCell>
                         <TableCell className="text-[#163681]/70">{toOutlet?.name || '-'}</TableCell>
-                        <TableCell className="text-[#163681]/70">{ingredient?.name || '-'}</TableCell>
-                        <TableCell className="text-[#163681]/70">{dist.quantity} {ingredient?.unit}</TableCell>
+                        <TableCell className="text-[#163681]/70">{dist.ingredient_name}</TableCell>
+                        <TableCell className="text-[#163681]/70">{dist.quantity} unit</TableCell>
                           <TableCell>
                             <span
                               className={`inline-block rounded-full px-2 py-1 text-xs font-medium ${
