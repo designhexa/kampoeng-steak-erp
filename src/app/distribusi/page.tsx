@@ -96,17 +96,17 @@ export default function DistribusiPage() {
     setIsSubmitting(true);
 
     try {
-      const data: DistributionInsert = {
+      const data: Database['public']['Tables']['distributions']['Insert'] = {
         from_outlet_id: parseInt(addForm.from_outlet_id),
         to_outlet_id: parseInt(addForm.to_outlet_id),
         ingredient_name: ingredients.find(i => i.id.toString() === addForm.ingredient_id)?.name || '',
         quantity: parseInt(addForm.quantity),
         status: 'Pending' as const
-      };
+      } satisfies Tables['distributions']['Insert'];
 
       const { error } = await supabase
         .from('distributions')
-        .insert(data);  // Supabase's typed client handles the array wrapping
+        .insert([data]);
 
       if (error) throw error;
 
@@ -129,7 +129,7 @@ export default function DistribusiPage() {
       };
       const { error } = await supabase
         .from('distributions')
-        .update(data)
+        .update(data as Tables['distributions']['Update'])
         .eq('id', distributionId);
 
       if (error) throw error;
