@@ -81,7 +81,7 @@ export default function InventoryPage() {
 
       const { error } = await supabase
         .from('ingredients')
-        .insert(data);
+        .insert(data as Tables['ingredients']['Insert']);
 
       if (error) throw error;
 
