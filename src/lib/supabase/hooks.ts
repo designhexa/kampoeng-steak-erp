@@ -58,7 +58,7 @@ export function useQuery<T extends TableName>(
     }
 
     fetchData()
-  }, [table, JSON.stringify(options)])
+  }, [table, options?.filter, options?.orderBy, options?.orderDirection, options?.limit])
 
   return { data, loading, error }
 }
