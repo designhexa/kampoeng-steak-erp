@@ -113,12 +113,12 @@ export default function OperasionalDashboard() {
                       <CardContent>
                         <div className="space-y-2 text-sm">
                           <div className="flex items-center justify-between">
-                            <span className="text-gray-600">Manager:</span>
-                            <span className="font-medium">{shift.manager_name || 'N/A'}</span>
+                            <span className="text-gray-600">Employee:</span>
+                            <span className="font-medium">{shift.employee_name || 'N/A'}</span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span className="text-gray-600">Opening:</span>
-                            <span className="font-medium">Rp {shift.opening_balance.toLocaleString('id-ID')}</span>
+                            <span className="text-gray-600">Initial Cash:</span>
+                            <span className="font-medium">Rp {shift.initial_cash.toLocaleString('id-ID')}</span>
                           </div>
                           <div className="text-xs text-gray-500 mt-2">
                             Mulai: {new Date(shift.created_at).toLocaleString('id-ID')}
@@ -142,9 +142,9 @@ export default function OperasionalDashboard() {
                         <tr>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-600">Shift ID</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-600">Outlet</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-600">Manager</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-600">Opening</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-600">Closing</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-600">Employee</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-600">Initial Cash</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-600">Shift Start</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-600">Status</th>
                         </tr>
                       </thead>
@@ -153,10 +153,10 @@ export default function OperasionalDashboard() {
                           <tr key={shift.id} className="hover:bg-gray-50">
                             <td className="px-4 py-3 text-sm font-medium">#{shift.id}</td>
                             <td className="px-4 py-3 text-sm">Outlet #{shift.outlet_id}</td>
-                            <td className="px-4 py-3 text-sm">{shift.manager_name || 'N/A'}</td>
-                            <td className="px-4 py-3 text-sm">Rp {shift.opening_balance.toLocaleString('id-ID')}</td>
+                            <td className="px-4 py-3 text-sm">{shift.employee_name || 'N/A'}</td>
+                            <td className="px-4 py-3 text-sm">Rp {shift.initial_cash.toLocaleString('id-ID')}</td>
                             <td className="px-4 py-3 text-sm">
-                              {shift.closing_balance ? `Rp ${shift.closing_balance.toLocaleString('id-ID')}` : '-'}
+                              {new Date(shift.shift_start).toLocaleString('id-ID')}
                             </td>
                             <td className="px-4 py-3 text-sm">
                               <Badge variant="secondary" className="bg-gray-100 text-gray-700">
