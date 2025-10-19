@@ -96,7 +96,7 @@ export default function PembelianPage() {
 
       const result = await supabase
         .from('purchase_orders')
-        .insert([data]);
+        .insert(data as Tables['purchase_orders']['Insert']);
 
       if (result.error) throw result.error;
 
@@ -119,7 +119,7 @@ export default function PembelianPage() {
 
       const { error } = await supabase
         .from('purchase_orders')
-        .update(data as any)
+        .update(data)
         .eq('id', poId);      if (error) throw error;
 
       await refreshData();
@@ -137,7 +137,7 @@ export default function PembelianPage() {
 
       const { error } = await supabase
         .from('purchase_orders')
-        .update(data as any)
+        .update(data)
         .eq('id', poId);      if (error) throw error;
 
       await refreshData();
