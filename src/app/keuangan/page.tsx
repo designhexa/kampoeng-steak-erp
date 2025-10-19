@@ -3,21 +3,14 @@
 import React, { useMemo, useState } from 'react';
 import { CollapsibleSidebar } from '@/components/collapsible-sidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { Database } from '@/lib/supabase/types';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TrendingUp, TrendingDown, DollarSign, PieChart } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useSupabase } from '@/contexts/supabase-context';
 
-interface CashFlow {
-  id: number;
-  outlet_id: number;
-  amount: number;
-  ctype: string;
-  category: string;
-  description: string;
-  created_at: string;
-}
+type CashFlow = Database['public']['Tables']['cash_flow']['Row'];
 
 export default function KeuanganPage() {
   const { sales, outlets, loading } = useSupabase();
@@ -54,7 +47,7 @@ export default function KeuanganPage() {
     }
 
     if (typeFilter !== 'all') {
-      filtered = filtered.filter(cf => cf.ctype === typeFilter);
+      filtered = filtered.filter(cf => cf.type === typeFilter);
     }
 
     if (search) {
@@ -71,11 +64,11 @@ export default function KeuanganPage() {
     const filtered = selectedOutlet === 0 ? cashFlow : cashFlow.filter(cf => cf.outlet_id === selectedOutlet);
     
     const inflow = filtered
-      .filter(cf => cf.ctype === 'Inflow')
+      .filter(cf => cf.type === 'Inflow')
       .reduce((sum, cf) => sum + Number(cf.amount), 0);
     
     const outflow = filtered
-      .filter(cf => cf.ctype === 'Outflow')
+      .filter(cf => cf.type === 'Outflow')
       .reduce((sum, cf) => sum + Number(cf.amount), 0);
 
     const filteredSales = selectedOutlet === 0 
@@ -95,7 +88,7 @@ export default function KeuanganPage() {
 
     filtered.forEach(cf => {
       const current = categories.get(cf.category) || { inflow: 0, outflow: 0 };
-      if (cf.ctype === 'Inflow') {
+      if (cf.type === 'Inflow') {
         current.inflow += Number(cf.amount);
       } else {
         current.outflow += Number(cf.amount);
@@ -280,8 +273,8 @@ export default function KeuanganPage() {
                     <div key={cf.id} className="flex items-center justify-between p-4 bg-blue-50/50 border border-blue-100 rounded-lg">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <span className={`text-lg font-semibold ${cf.ctype === 'Inflow' ? 'text-green-600' : 'text-red-600'}`}>
-                            {cf.ctype === 'Inflow' ? '+' : '-'} Rp {Number(cf.amount).toLocaleString('id-ID')}
+                          <span className={`text-lg font-semibold ${cf.type === 'Inflow' ? 'text-green-600' : 'text-red-600'}`}>
+                            {cf.type === 'Inflow' ? '+' : '-'} Rp {Number(cf.amount).toLocaleString('id-ID')}
                           </span>
                           <span className="text-sm bg-blue-100 text-[#163681] px-2 py-1 rounded">{cf.category}</span>
                         </div>
