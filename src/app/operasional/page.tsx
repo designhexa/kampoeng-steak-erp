@@ -17,7 +17,7 @@ import { supabase } from '@/lib/supabase/client';
 interface DailyChecklist {
   id: number;
   outlet_id: number;
-  notes: string;
+  task: string;
   completed: boolean;
   created_at: string;
 }
@@ -25,10 +25,10 @@ interface DailyChecklist {
 interface ShiftReport {
   id: number;
   outlet_id: number;
-  opening_cash: number;
-  notes: string;
-  closed: boolean;
-  shift_date: string;
+  employee_name: string;
+  shift_start: string;
+  initial_cash: number;
+  status: 'Open' | 'Closed';
   created_at: string;
 }
 
@@ -42,13 +42,13 @@ export default function OperasionalPage() {
 
   const [checklistForm, setChecklistForm] = useState({
     outletId: '',
-    notes: '',
+    task: '',
   });
 
   const [shiftForm, setShiftForm] = useState({
     outletId: '',
-    openingCash: '',
-    notes: '',
+    employeeName: '',
+    initialCash: '',
   });
 
   React.useEffect(() => {
@@ -86,7 +86,7 @@ export default function OperasionalPage() {
 
   const stats = useMemo(() => {
     const completedChecklists = checklists.filter((c) => c.completed).length;
-    const openShifts = shifts.filter((s) => !s.closed).length;
+    const openShifts = shifts.filter((s) => s.status === 'Open').length;
 
     return {
       totalChecklists: checklists.length,
@@ -103,13 +103,13 @@ export default function OperasionalPage() {
     try {
       const { error } = await supabase.from('daily_checklists').insert({
         outlet_id: parseInt(checklistForm.outletId),
-        notes: checklistForm.notes,
+        task: checklistForm.task,
         completed: false,
       });
 
       if (error) throw error;
 
-      setChecklistForm({ outletId: '', notes: '' });
+      setChecklistForm({ outletId: '', task: '' });
       setIsChecklistOpen(false);
       await fetchChecklists();
     } catch (error) {
@@ -127,15 +127,15 @@ export default function OperasionalPage() {
     try {
       const { error } = await supabase.from('shift_reports').insert({
         outlet_id: parseInt(shiftForm.outletId),
-        opening_cash: parseFloat(shiftForm.openingCash),
-        notes: shiftForm.notes,
-        closed: false,
-        shift_date: new Date().toISOString(),
+        employee_name: shiftForm.employeeName,
+        initial_cash: parseFloat(shiftForm.initialCash),
+        status: 'Open',
+        shift_start: new Date().toISOString(),
       });
 
       if (error) throw error;
 
-      setShiftForm({ outletId: '', openingCash: '', notes: '' });
+      setShiftForm({ outletId: '', employeeName: '', initialCash: '' });
       setIsShiftOpen(false);
       await fetchShifts();
     } catch (error) {
@@ -212,12 +212,12 @@ export default function OperasionalPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="notes">Catatan</Label>
+                    <Label htmlFor="task">Task</Label>
                     <Textarea
-                      id="notes"
+                      id="task"
                       placeholder="Kebersihan, suhu kulkas, kelengkapan alat, dll"
-                      value={checklistForm.notes}
-                      onChange={(e) => setChecklistForm({ ...checklistForm, notes: e.target.value })}
+                      value={checklistForm.task}
+                      onChange={(e) => setChecklistForm({ ...checklistForm, task: e.target.value })}
                       rows={4}
                     />
                   </div>
@@ -263,25 +263,26 @@ export default function OperasionalPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="cash">Kas Awal (Rp)</Label>
+                    <Label htmlFor="employeeName">Nama Karyawan</Label>
                     <Input
-                      id="cash"
-                      type="number"
-                      placeholder="0"
-                      value={shiftForm.openingCash}
-                      onChange={(e) => setShiftForm({ ...shiftForm, openingCash: e.target.value })}
+                      id="employeeName"
+                      type="text"
+                      placeholder="Nama karyawan yang bertugas"
+                      value={shiftForm.employeeName}
+                      onChange={(e) => setShiftForm({ ...shiftForm, employeeName: e.target.value })}
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="shiftNotes">Catatan Shift</Label>
-                    <Textarea
-                      id="shiftNotes"
-                      placeholder="Kondisi awal shift, catatan khusus"
-                      value={shiftForm.notes}
-                      onChange={(e) => setShiftForm({ ...shiftForm, notes: e.target.value })}
-                      rows={3}
+                    <Label htmlFor="cash">Kas Awal (Rp)</Label>
+                    <Input
+                      id="cash"
+                      type="number"
+                      placeholder="0"
+                      value={shiftForm.initialCash}
+                      onChange={(e) => setShiftForm({ ...shiftForm, initialCash: e.target.value })}
+                      required
                     />
                   </div>
 
@@ -419,20 +420,20 @@ export default function OperasionalPage() {
                           <TableRow key={shift.id} className="border-blue-100">
                             <TableCell className="font-medium text-[#163681]">{outlet?.name || '-'}</TableCell>
                             <TableCell className="text-[#163681]/70">
-                              Rp {(shift.opening_cash ?? 0).toLocaleString('id-ID')}
+                              Rp {(shift.initial_cash ?? 0).toLocaleString('id-ID')}
                             </TableCell>
                             <TableCell className="text-[#163681]/70">
-                              {shift.shift_date ? new Date(shift.shift_date).toLocaleDateString('id-ID') : '-'}
+                              {shift.shift_start ? new Date(shift.shift_start).toLocaleDateString('id-ID') : '-'}
                             </TableCell>
                             <TableCell>
                               <span
                                 className={`inline-block rounded-full px-2 py-1 text-xs font-medium ${
-                                  shift.closed
+                                  shift.status === 'Closed'
                                     ? 'bg-gray-100 text-gray-700'
                                     : 'bg-green-100 text-green-700'
                                 }`}
                               >
-                                {shift.closed ? 'Closed' : 'Open'}
+                                {shift.status}
                               </span>
                             </TableCell>
                           </TableRow>
