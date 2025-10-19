@@ -128,8 +128,7 @@ export default function MenuPage() {
         <main className="flex-1 overflow-auto p-4 md:p-6 bg-gradient-to-br from-blue-50 to-blue-100/30">
           <div className="max-w-7xl mx-auto">
             <div className="mb-6">
-              <h2 className="text-lg md:text-xl font-bold mb-2 text-[#163681]">Modul Aplikasi</h2>
-              <p className="text-sm text-[#163681]/70">Sistem ERP terintegrasi untuk 18 outlet Kampoeng Steak</p>
+              <h2 className="text-lg md:text-xl font-bold mb-2 text-[#163681]">Sistem terintegrasi untuk 18 outlet Kampoeng Steak</h2              
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
