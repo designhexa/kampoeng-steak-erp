@@ -95,10 +95,12 @@ export function useSpacetimeDB() {
     };
   }, []);
 
+  const connection = connectionRef.current;
+
   return {
     connected,
     identity,
     statusMessage,
-    connection: connectionRef.current,
+    connection,
   };
 }
