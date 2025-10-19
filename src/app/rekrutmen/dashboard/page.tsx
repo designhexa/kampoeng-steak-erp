@@ -99,7 +99,7 @@ export default function RekrutmenDashboard() {
                       {appliedCandidates.slice(0, 5).map((candidate) => (
                         <div key={candidate.id} className="p-2 bg-blue-50 rounded">
                           <p className="text-sm font-medium">{candidate.name}</p>
-                          <p className="text-xs text-gray-600">{candidate.position_applied}</p>
+                          <p className="text-xs text-gray-600">{candidate.position}</p>
                           <p className="text-xs text-gray-500 mt-1">
                             {new Date(candidate.created_at).toLocaleDateString('id-ID')}
                           </p>
@@ -121,7 +121,7 @@ export default function RekrutmenDashboard() {
                       {interviewCandidates.slice(0, 5).map((candidate) => (
                         <div key={candidate.id} className="p-2 bg-yellow-50 rounded">
                           <p className="text-sm font-medium">{candidate.name}</p>
-                          <p className="text-xs text-gray-600">{candidate.position_applied}</p>
+                          <p className="text-xs text-gray-600">{candidate.position}</p>
                           <p className="text-xs text-gray-500 mt-1">
                             {new Date(candidate.created_at).toLocaleDateString('id-ID')}
                           </p>
@@ -143,7 +143,7 @@ export default function RekrutmenDashboard() {
                       {hiredCandidates.slice(0, 5).map((candidate) => (
                         <div key={candidate.id} className="p-2 bg-green-50 rounded">
                           <p className="text-sm font-medium">{candidate.name}</p>
-                          <p className="text-xs text-gray-600">{candidate.position_applied}</p>
+                          <p className="text-xs text-gray-600">{candidate.position}</p>
                           <p className="text-xs text-gray-500 mt-1">
                             {new Date(candidate.created_at).toLocaleDateString('id-ID')}
                           </p>
