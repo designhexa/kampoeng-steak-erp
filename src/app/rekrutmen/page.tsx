@@ -12,21 +12,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { UserPlus, FileText, UserCheck, UserX, Plus, ArrowUpDown } from 'lucide-react';
 import { useSupabase } from '@/contexts/supabase-context';
 import { supabase } from '@/lib/supabase/client';
+import type { Database } from '@/lib/supabase/types';
 
-type CandidateStatus = 'Applied' | 'Interview' | 'Hired' | 'Rejected';
-
-interface Candidate {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  position: string;
-  status: CandidateStatus;
-  created_at: string;
-}
+type Candidate = Database['public']['Tables']['candidates']['Row'];
+type CandidateStatus = Candidate['status'];
 
 export default function RekrutmenPage() {
-  const { loading } = useSupabase();
+  const { loading, outlets = [] } = useSupabase();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -37,9 +29,8 @@ export default function RekrutmenPage() {
 
   const [addForm, setAddForm] = useState({
     name: '',
-    email: '',
-    phone: '',
     position: '',
+    outletId: '1',  // Default to first outlet
   });
 
   // Fetch candidates
@@ -71,7 +62,6 @@ export default function RekrutmenPage() {
     if (search) {
       filtered = filtered.filter(c =>
         c.name.toLowerCase().includes(search.toLowerCase()) ||
-        c.email.toLowerCase().includes(search.toLowerCase()) ||
         c.position.toLowerCase().includes(search.toLowerCase())
       );
     }
@@ -107,15 +97,14 @@ export default function RekrutmenPage() {
     try {
       const { error } = await supabase.from('candidates').insert({
         name: addForm.name,
-        email: addForm.email,
-        phone: addForm.phone,
         position: addForm.position,
+        outlet_id: parseInt(addForm.outletId),
         status: 'Applied',
       });
 
       if (error) throw error;
 
-      setAddForm({ name: '', email: '', phone: '', position: '' });
+      setAddForm({ name: '', position: '', outletId: '1' });
       setIsDialogOpen(false);
       await fetchCandidates();
     } catch (error) {
@@ -199,26 +188,19 @@ export default function RekrutmenPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={addForm.email}
-                    onChange={(e) => setAddForm({ ...addForm, email: e.target.value })}
-                    placeholder="john@example.com"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="phone">Telepon</Label>
-                  <Input
-                    id="phone"
-                    value={addForm.phone}
-                    onChange={(e) => setAddForm({ ...addForm, phone: e.target.value })}
-                    placeholder="08123456789"
-                    required
-                  />
+                  <Label htmlFor="outletId">Outlet</Label>
+                  <Select value={addForm.outletId} onValueChange={(value) => setAddForm({ ...addForm, outletId: value })}>
+                    <SelectTrigger id="outletId">
+                      <SelectValue placeholder="Pilih outlet" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {outlets.map((outlet) => (
+                        <SelectItem key={outlet.id} value={outlet.id.toString()}>
+                          {outlet.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div>
@@ -327,8 +309,7 @@ export default function RekrutmenPage() {
                   <TableHeader>
                     <TableRow className="border-blue-200">
                       <TableHead className="text-[#163681]">Nama</TableHead>
-                      <TableHead className="text-[#163681]">Email</TableHead>
-                      <TableHead className="text-[#163681]">Telepon</TableHead>
+                      <TableHead className="text-[#163681]">Outlet</TableHead>
                       <TableHead className="text-[#163681]">Posisi</TableHead>
                       <TableHead className="text-[#163681]">Status</TableHead>
                       <TableHead className="text-[#163681]">Tanggal Lamar</TableHead>
@@ -339,8 +320,7 @@ export default function RekrutmenPage() {
                     {filteredAndSortedCandidates.map((candidate) => (
                       <TableRow key={candidate.id} className="border-blue-100">
                         <TableCell className="font-medium text-[#163681]">{candidate.name}</TableCell>
-                        <TableCell className="text-[#163681]/70">{candidate.email}</TableCell>
-                        <TableCell className="text-[#163681]/70">{candidate.phone}</TableCell>
+                        <TableCell className="text-[#163681]/70">Outlet #{candidate.outlet_id}</TableCell>
                         <TableCell className="text-[#163681]/70">{candidate.position}</TableCell>
                         <TableCell>
                           <span
