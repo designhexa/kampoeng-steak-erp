@@ -17,7 +17,7 @@ export default function InventoryDashboard() {
 
   const criticalStock = ingredients.filter(i => i.status === 'Critical');
   const lowStock = ingredients.filter(i => i.status === 'Low');
-  const availableStock = ingredients.filter(i => i.status === 'Available');
+  const availableStock = ingredients.filter(i => i.status === 'Normal');
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -97,7 +97,7 @@ export default function InventoryDashboard() {
                       <div key={item.id} className="flex items-center justify-between text-sm">
                         <span className="font-medium">{item.name}</span>
                         <Badge variant="destructive" className="text-xs">
-                          {item.quantity} {item.unit} tersisa
+                          {item.stock} {item.unit} tersisa
                         </Badge>
                       </div>
                     ))}
@@ -131,7 +131,7 @@ export default function InventoryDashboard() {
                         <div key={item.id} className="flex justify-between text-sm">
                           <span className="text-gray-700">{item.name}</span>
                           <span className="text-green-600 font-medium">
-                            {item.quantity} {item.unit}
+                            {item.stock} {item.unit}
                           </span>
                         </div>
                       ))}
@@ -152,7 +152,7 @@ export default function InventoryDashboard() {
                         <div key={item.id} className="flex justify-between text-sm">
                           <span className="text-gray-700">{item.name}</span>
                           <span className="text-yellow-600 font-medium">
-                            {item.quantity} {item.unit}
+                            {item.stock} {item.unit}
                           </span>
                         </div>
                       ))}
@@ -173,7 +173,7 @@ export default function InventoryDashboard() {
                         <div key={item.id} className="flex justify-between text-sm">
                           <span className="text-gray-700">{item.name}</span>
                           <span className="text-red-600 font-medium">
-                            {item.quantity} {item.unit}
+                            {item.stock} {item.unit}
                           </span>
                         </div>
                       ))}
