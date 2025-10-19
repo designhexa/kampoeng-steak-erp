@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
-  Store, MapPin, CheckCircle2, XCircle, Clock, Users
+  Store, MapPin, CheckCircle2, XCircle, Clock
 } from 'lucide-react';
 import { useSupabase } from '@/contexts/supabase-context';
 
@@ -17,7 +17,7 @@ export default function OutletsDashboard() {
 
   const openOutlets = outlets.filter(o => o.status === 'Open');
   const closedOutlets = outlets.filter(o => o.status === 'Closed');
-  const underMaintenanceOutlets = outlets.filter(o => o.status === 'Under Maintenance');
+  const renovationOutlets = outlets.filter(o => o.status === 'Renovation');
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -72,12 +72,12 @@ export default function OutletsDashboard() {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">Maintenance</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">Renovasi</CardTitle>
                   <Clock className="h-4 w-4 text-yellow-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-yellow-600">{underMaintenanceOutlets.length}</div>
-                  <p className="text-xs text-gray-600 mt-1">Dalam perawatan</p>
+                  <div className="text-2xl font-bold text-yellow-600">{renovationOutlets.length}</div>
+                  <p className="text-xs text-gray-600 mt-1">Dalam renovasi</p>
                 </CardContent>
               </Card>
             </div>
@@ -102,7 +102,7 @@ export default function OutletsDashboard() {
                           </CardTitle>
                           <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
                             <MapPin className="h-3 w-3" />
-                            {outlet.city}
+                            {outlet.area}
                           </div>
                         </div>
                         <Badge 
@@ -120,13 +120,9 @@ export default function OutletsDashboard() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Users className="h-4 w-4" />
-                          <span>{outlet.manager_name || 'No Manager'}</span>
+                        <div className="space-y-2 text-sm">
+                          <div className="text-xs text-gray-500">{outlet.address}</div>
                         </div>
-                        <div className="text-xs text-gray-500">{outlet.address}</div>
-                      </div>
                     </CardContent>
                   </Card>
                 ))}
