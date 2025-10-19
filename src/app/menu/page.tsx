@@ -30,7 +30,7 @@ export default function MenuPage() {
       icon: Package,
       color: 'bg-green-500',
       href: '/inventory',
-      stats: `${ingredients.filter(i => i.status === 'Critical').length} kritis`
+      stats: `${ingredients.filter(i => i.stock <= 10).length} kritis`
     },
     {
       title: 'Point of Sale',
