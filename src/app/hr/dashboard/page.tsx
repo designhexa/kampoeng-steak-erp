@@ -16,8 +16,8 @@ export default function HRDashboard() {
   const { employees = [] } = useSupabase();
 
   // Filter employees based on their status
-  const activeEmployees = employees?.filter(e => e.status === 'Active') ?? [];
-  const inactiveEmployees = employees?.filter(e => e.status === 'Inactive') ?? [];
+  const activeEmployees = employees.filter(e => e.status === 'Active');
+  const inactiveEmployees = employees.filter(e => e.status === 'Inactive');
   // Note: OnLeave status is not supported in the current schema
   const onLeaveEmployees: typeof employees = [];
 
