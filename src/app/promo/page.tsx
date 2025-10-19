@@ -12,15 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Gift, Plus, Percent, DollarSign } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 
-interface Promotion {
-  id: number;
-  name: string;
-  discount_type: string;
-  discount_value: number;
-  start_date: string;
-  end_date: string;
-  created_at: string;
-}
+import type { Database } from '@/lib/supabase/types';
+
+type Tables = Database['public']['Tables']
+type Promotion = Tables['promotions']['Row'];
 
 export default function PromoPage() {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -28,7 +23,15 @@ export default function PromoPage() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [formData, setFormData] = useState({
+  type PromotionForm = {
+    name: string;
+    discountType: Tables['promotions']['Row']['discount_type'] | '';
+    discountValue: string;
+    startDate: string;
+    endDate: string;
+  };
+
+  const [formData, setFormData] = useState<PromotionForm>({
     name: '',
     discountType: '',
     discountValue: '',
@@ -79,12 +82,18 @@ export default function PromoPage() {
     setIsSubmitting(true);
 
     try {
+      // Determine initial status based on start date
+      const now = new Date();
+      const startDate = new Date(formData.startDate);
+      const status = startDate > now ? 'Upcoming' : 'Active';
+
       const { error } = await supabase.from('promotions').insert({
         name: formData.name,
         discount_type: formData.discountType,
         discount_value: parseFloat(formData.discountValue),
         start_date: formData.startDate,
         end_date: formData.endDate,
+        status,
       });
 
       if (error) throw error;
@@ -152,20 +161,25 @@ export default function PromoPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="discountType">Tipe Diskon</Label>
-                  <Select value={formData.discountType} onValueChange={(value) => setFormData({ ...formData, discountType: value })}>
+                  <Select 
+                    value={formData.discountType} 
+                    onValueChange={(value: Tables['promotions']['Row']['discount_type']) => 
+                      setFormData({ ...formData, discountType: value })
+                    }
+                  >
                     <SelectTrigger id="discountType">
                       <SelectValue placeholder="Pilih tipe diskon" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="percentage">Persentase (%)</SelectItem>
-                      <SelectItem value="fixed">Nominal (Rp)</SelectItem>
+                      <SelectItem value="Percentage">Persentase (%)</SelectItem>
+                      <SelectItem value="Fixed">Nominal (Rp)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="discountValue">
-                    Nilai Diskon {formData.discountType === 'percentage' ? '(%)' : '(Rp)'}
+                    Nilai Diskon {formData.discountType === 'Percentage' ? '(%)' : '(Rp)'}
                   </Label>
                   <Input
                     id="discountValue"
@@ -288,9 +302,9 @@ export default function PromoPage() {
                       return (
                         <TableRow key={promo.id} className="border-blue-100">
                           <TableCell className="font-medium text-[#163681]">{promo.name}</TableCell>
-                          <TableCell className="text-[#163681]/70">{promo.discount_type === 'percentage' ? 'Persentase' : 'Nominal'}</TableCell>
+                          <TableCell className="text-[#163681]/70">{promo.discount_type === 'Percentage' ? 'Persentase' : 'Nominal'}</TableCell>
                           <TableCell className="text-[#163681]/70">
-                            {promo.discount_type === 'percentage' 
+                            {promo.discount_type === 'Percentage' 
                               ? `${promo.discount_value}%`
                               : `Rp ${promo.discount_value.toLocaleString('id-ID')}`
                             }
