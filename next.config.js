@@ -11,4 +11,8 @@ const nextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    // This enables experimental features in Supabase client
+    serverActions: true,
+  },
 }
