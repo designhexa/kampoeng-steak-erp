@@ -7,6 +7,9 @@ import type { Database } from '@/lib/supabase/types';
 type Tables = Database['public']['Tables'];
 
 interface SupabaseContextType {
+  // Supabase client instance
+  supabase: typeof supabase;
+  
   // Connection status
   isConnected: boolean;
   isConfigured: boolean;
@@ -186,6 +189,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   }, [isConfigured, isConnected]);
 
   const value: SupabaseContextType = {
+    supabase,
     isConnected,
     isConfigured,
     outlets,

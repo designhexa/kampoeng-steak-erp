@@ -1,84 +1,97 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { User, UserRole } from '../spacetime_module_bindings';
-import { useSpacetimeDB } from '../hooks/use-spacetime';
+import { useSupabase } from './supabase-context';
+import type { Database } from '@/lib/supabase/types';
+
+type UserRole = 'AdminPusat' | 'AreaManager' | 'OutletManager' | 'Kasir' | 'HR' | 'Gudang' | 'Finance';
 
 interface AuthContextType {
-  user: User | null;
+  user: Database['public']['Tables']['users']['Row'] | null;
   role: UserRole | null;
-  outletId: bigint;
+  outletId: number | null;
   isLoading: boolean;
-  setDemoUser: (role: string) => void;
+  setDemoUser: (role: UserRole) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   role: null,
-  outletId: BigInt(1),
+  outletId: null,
   isLoading: true,
   setDemoUser: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { connected, connection, identity } = useSpacetimeDB();
-  const [user, setUser] = useState<User | null>(null);
+  const { supabase, isConfigured } = useSupabase();
+  const [user, setUser] = useState<Database['public']['Tables']['users']['Row'] | null>(null);
   const [role, setRole] = useState<UserRole | null>(null);
-  const [outletId, setOutletId] = useState<bigint>(BigInt(1));
+  const [outletId, setOutletId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const setDemoUser = (demoRole: string) => {
-    const roleMap: Record<string, UserRole> = {
-      Admin: { tag: 'Admin' },
-      AreaManager: { tag: 'AreaManager' },
-      OutletManager: { tag: 'OutletManager' },
-      Cashier: { tag: 'Cashier' },
-      HR: { tag: 'HR' },
-      Finance: { tag: 'Finance' },
-    };
+  const setDemoUser = async (demoRole: UserRole) => {
+    try {
+      // Fetch or create a demo user
+      const { data: demoUser, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('role', demoRole)
+        .single<Database['public']['Tables']['users']['Row']>();
 
-    const selectedRole = roleMap[demoRole] || { tag: 'Admin' };
-    setRole(selectedRole);
-    setOutletId(demoRole === 'Admin' ? BigInt(0) : BigInt(1));
-    console.log('Demo role set to:', demoRole);
+      if (error) throw error;
+
+      if (demoUser) {
+        setUser(demoUser);
+        setRole(demoUser.role);
+        setOutletId(demoUser.outlet_id);
+        console.log('Demo user set:', demoUser);
+      }
+    } catch (error) {
+      console.error('Error setting demo user:', error);
+      // Set defaults on error
+      setRole('AdminPusat');
+      setOutletId(null);
+    }
   };
 
   useEffect(() => {
-    if (connected && connection && identity) {
+    if (!isConfigured) {
+      setIsLoading(false);
+      return;
+    }
+
+    const loadInitialUser = async () => {
       try {
-        // Safely check if users table exists and has data
-        if (connection.db && connection.db.users && connection.db.users.id) {
-          const currentUser = connection.db.users.id().find(identity);
-          if (currentUser) {
-            setUser(currentUser);
-            setRole(currentUser.role);
-            setOutletId(currentUser.outletId);
-            console.log('User loaded from database:', currentUser);
-          } else {
-            // No user found, set default admin role
-            console.log('No user found, setting default admin role');
-            setRole({ tag: 'Admin' });
-            setOutletId(BigInt(0));
-          }
+        // Try to get admin user first
+        const { data: adminUser, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('role', 'AdminPusat')
+          .single<Database['public']['Tables']['users']['Row']>();
+
+        if (error) throw error;
+
+        if (adminUser) {
+          setUser(adminUser);
+          setRole(adminUser.role);
+          setOutletId(adminUser.outlet_id);
+          console.log('Admin user loaded:', adminUser);
         } else {
-          // Table not ready yet, set default
-          console.log('Users table not ready, setting default admin role');
-          setRole({ tag: 'Admin' });
-          setOutletId(BigInt(0));
+          console.log('No admin user found, setting defaults');
+          setRole('AdminPusat');
+          setOutletId(null);
         }
       } catch (error) {
         console.error('Error loading user:', error);
-        // On error, set default admin role
-        setRole({ tag: 'Admin' });
-        setOutletId(BigInt(0));
+        setRole('AdminPusat');
+        setOutletId(null);
       } finally {
         setIsLoading(false);
       }
-    } else if (!connected) {
-      // Still connecting
-      setIsLoading(true);
-    }
-  }, [connected, connection, identity]);
+    };
+
+    loadInitialUser();
+  }, [isConfigured, supabase]);
 
   return (
     <AuthContext.Provider value={{ user, role, outletId, isLoading, setDemoUser }}>
