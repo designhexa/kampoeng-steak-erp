@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
-import type { Database } from '@/lib/supabase/db.types';
+import type { Database } from '@/lib/supabase/types';
 
 type Tables = Database['public']['Tables'];
 
@@ -159,7 +159,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   // Initial data fetch
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   // Setup real-time subscriptions for all tables
   useEffect(() => {
@@ -186,7 +186,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     return () => {
       channels.forEach(channel => supabase.removeChannel(channel));
     };
-  }, [isConfigured, isConnected]);
+  }, [isConfigured, isConnected, fetchData]);
 
   const value: SupabaseContextType = {
     supabase,
