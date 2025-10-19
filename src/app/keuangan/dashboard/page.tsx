@@ -6,19 +6,19 @@ import { CollapsibleSidebar } from '@/components/collapsible-sidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
-  DollarSign, TrendingUp, TrendingDown, Wallet, PieChart
+  DollarSign, TrendingUp, TrendingDown, Wallet
 } from 'lucide-react';
 import { useSupabase } from '@/contexts/supabase-context';
 
 export default function KeuanganDashboard() {
   const router = useRouter();
-  const { cashFlows = [], sales = [] } = useSupabase();
+  const { cashFlow = [], sales = [] } = useSupabase();
 
-  const cashIn = cashFlows.filter(cf => cf.type === 'Income');
-  const cashOut = cashFlows.filter(cf => cf.type === 'Expense');
-  const totalIncome = cashIn.reduce((sum, cf) => sum + cf.amount, 0);
-  const totalExpense = cashOut.reduce((sum, cf) => sum + cf.amount, 0);
-  const totalRevenue = sales.reduce((sum, sale) => sum + sale.total_amount, 0);
+  const cashIn = cashFlow.filter((cf: { type: string }) => cf.type === 'Income');
+  const cashOut = cashFlow.filter((cf: { type: string }) => cf.type === 'Expense');
+  const totalIncome = cashIn.reduce((sum: number, cf: { amount: number }) => sum + cf.amount, 0);
+  const totalExpense = cashOut.reduce((sum: number, cf: { amount: number }) => sum + cf.amount, 0);
+  const totalRevenue = sales.reduce((sum, sale) => sum + sale.total, 0);
   const netCashFlow = totalIncome - totalExpense;
 
   return (
@@ -104,7 +104,7 @@ export default function KeuanganDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {cashIn.slice(0, 5).map((flow) => (
+                    {cashIn.slice(0, 5).map((flow: { id: number; description: string; amount: number; created_at: string }) => (
                       <div key={flow.id} className="flex justify-between items-center">
                         <div className="flex-1">
                           <p className="text-sm font-medium">{flow.description}</p>
@@ -139,7 +139,7 @@ export default function KeuanganDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {cashOut.slice(0, 5).map((flow) => (
+                    {cashOut.slice(0, 5).map((flow: { id: number; description: string; amount: number; created_at: string }) => (
                       <div key={flow.id} className="flex justify-between items-center">
                         <div className="flex-1">
                           <p className="text-sm font-medium">{flow.description}</p>
