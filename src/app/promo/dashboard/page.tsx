@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import type { Database } from '@/lib/supabase/types';
 import { CollapsibleSidebar } from '@/components/collapsible-sidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,12 +12,15 @@ import {
 } from 'lucide-react';
 import { useSupabase } from '@/contexts/supabase-context';
 
+type Tables = Database['public']['Tables']
+type Promotion = Tables['promotions']['Row'];
+
 export default function PromoDashboard() {
   const router = useRouter();
   const { promotions = [] } = useSupabase();
 
   const activePromos = promotions.filter(p => p.status === 'Active');
-  const scheduledPromos = promotions.filter(p => p.status === 'Scheduled');
+  const scheduledPromos = promotions.filter(p => p.status === 'Upcoming');
   const expiredPromos = promotions.filter(p => p.status === 'Expired');
 
   return (
@@ -98,7 +102,6 @@ export default function PromoDashboard() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <CardTitle className="text-base">{promo.name}</CardTitle>
-                          <p className="text-xs text-gray-500 mt-1">{promo.description}</p>
                         </div>
                         <Badge className="bg-green-100 text-green-700">
                           Active
@@ -109,11 +112,12 @@ export default function PromoDashboard() {
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-600">Discount:</span>
-                          <span className="font-medium">{promo.discount_value}%</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Type:</span>
-                          <span className="font-medium">{promo.discount_type}</span>
+                          <span className="font-medium">
+                            {promo.discount_type === 'Percentage' 
+                              ? `${promo.discount_value}%`
+                              : `Rp ${promo.discount_value.toLocaleString('id-ID')}`
+                            }
+                          </span>
                         </div>
                         <div className="text-xs text-gray-500 mt-2">
                           Berakhir: {new Date(promo.end_date).toLocaleDateString('id-ID')}
@@ -136,10 +140,9 @@ export default function PromoDashboard() {
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <CardTitle className="text-base">{promo.name}</CardTitle>
-                            <p className="text-xs text-gray-500 mt-1">{promo.description}</p>
                           </div>
                           <Badge className="bg-blue-100 text-blue-700">
-                            Scheduled
+                            Upcoming
                           </Badge>
                         </div>
                       </CardHeader>
@@ -147,7 +150,12 @@ export default function PromoDashboard() {
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-600">Discount:</span>
-                            <span className="font-medium">{promo.discount_value}%</span>
+                            <span className="font-medium">
+                              {promo.discount_type === 'Percentage' 
+                                ? `${promo.discount_value}%`
+                                : `Rp ${promo.discount_value.toLocaleString('id-ID')}`
+                              }
+                            </span>
                           </div>
                           <div className="text-xs text-gray-500 mt-2">
                             Mulai: {new Date(promo.start_date).toLocaleDateString('id-ID')}
