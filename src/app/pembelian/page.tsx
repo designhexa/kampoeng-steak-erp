@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { TruckIcon, Clock, CheckCircle, XCircle, Plus, ThumbsUp, ThumbsDown, ArrowUpDown } from 'lucide-react';
 import { useSupabase } from '@/contexts/supabase-context';
 import { supabase } from '@/lib/supabase/client';
+import type { Database } from '@/lib/supabase/types';
 
 export default function PembelianPage() {
   const { purchaseOrders, suppliers, outlets, loading, refreshData } = useSupabase();
@@ -81,14 +82,16 @@ export default function PembelianPage() {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.from('purchase_orders').insert({
-        outlet_id: parseInt(addForm.outlet_id),
-        supplier_id: parseInt(addForm.supplier_id),
-        total: parseInt(addForm.total),
-        status: 'Pending',
-      });
+      const result = await (supabase
+        .from('purchase_orders')
+        .insert([{
+          outlet_id: parseInt(addForm.outlet_id),
+          supplier_id: parseInt(addForm.supplier_id),
+          total: parseInt(addForm.total),
+          status: 'Pending'
+        }] as any) as unknown as Promise<{ data: any; error: any }>);
 
-      if (error) throw error;
+      if (result.error) throw result.error;
 
       setAddForm({ outlet_id: '', supplier_id: '', total: '' });
       setIsAddDialogOpen(false);
@@ -103,10 +106,14 @@ export default function PembelianPage() {
 
   const handleApprove = async (poId: number): Promise<void> => {
     try {
-      const { error } = await supabase
+      const updateData: Database['public']['Tables']['purchase_orders']['Update'] = {
+        status: 'Approved'
+      };
+
+      const { error } = await (supabase
         .from('purchase_orders')
-        .update({ status: 'Approved' })
-        .eq('id', poId);
+        .update(updateData)
+        .eq('id', poId) as unknown as Promise<{ data: any; error: any }>);
 
       if (error) throw error;
 
@@ -119,10 +126,14 @@ export default function PembelianPage() {
 
   const handleReject = async (poId: number): Promise<void> => {
     try {
-      const { error } = await supabase
+      const updateData: Database['public']['Tables']['purchase_orders']['Update'] = {
+        status: 'Rejected'
+      };
+
+      const { error } = await (supabase
         .from('purchase_orders')
-        .update({ status: 'Rejected' })
-        .eq('id', poId);
+        .update(updateData)
+        .eq('id', poId) as unknown as Promise<{ data: any; error: any }>);
 
       if (error) throw error;
 
