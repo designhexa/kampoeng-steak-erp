@@ -14,13 +14,17 @@ import { useSupabase } from '@/contexts/supabase-context';
 import { supabase } from '@/lib/supabase/typed-client';
 import type { Database } from '@/lib/supabase/types';
 type Tables = Database['public']['Tables'];
+type Ingredient = Tables['ingredients']['Row'];
 
 export default function InventoryPage() {
-  const { ingredients, outlets, loading, refreshData } = useSupabase();
+  const { ingredients: rawIngredients, outlets, loading, refreshData } = useSupabase();
+  const ingredients = rawIngredients as Tables['ingredients']['Row'][];
   const [search, setSearch] = useState<string>('');
   const [selectedOutlet, setSelectedOutlet] = useState<number>(0);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // Use ingredients array with proper type from context
 
   // Add form state
   const [addForm, setAddForm] = useState({
@@ -81,7 +85,7 @@ export default function InventoryPage() {
 
       const { error } = await supabase
         .from('ingredients')
-        .insert(data as Tables['ingredients']['Insert']);
+        .insert([data]);
 
       if (error) throw error;
 
@@ -115,7 +119,7 @@ export default function InventoryPage() {
 
       const { error } = await supabase
         .from('ingredients')
-        .update(data)
+        .update(data as Tables['ingredients']['Update'])
         .eq('id', ingredientId);
 
       if (error) throw error;
