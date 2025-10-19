@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
-  Package, AlertTriangle, CheckCircle2, TrendingDown, TrendingUp
+  Package, AlertTriangle, CheckCircle2, TrendingDown
 } from 'lucide-react';
 import { useSupabase } from '@/contexts/supabase-context';
 
